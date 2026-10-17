@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏫 우리 반 1인 1역할 & 학급 경제 배정기</title>
+  <!-- 따뜻하고 둥글둥글한 무료 한글 폰트 (Google Fonts Jua & Noto Sans KR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mint-primary: #2EC4B6;
+      --mint-dark: #1F9D91;
+      --mint-light: #E8F8F5;
+      --coral-primary: #FF6F61;
+      --coral-dark: #E85548;
+      --coral-light: #FFF0EE;
+      --gold: #F59E0B;
+      --gold-light: #FEF3C7;
+      --bg-page: #F4FAF8;
+      --bg-card: #FFFFFF;
+      --border-color: #D3ECE7;
+      --text-main: #243330;
+      --text-muted: #607973;
+      --font-display: 'Jua', sans-serif;
+      --font-body: 'Noto Sans KR', sans-serif;
+      --shadow: 0 10px 25px rgba(46, 196, 182, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      padding: 24px;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* 꽃가루 캔버스 */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* 상단 헤더 */
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      letter-spacing: 1px;
+      color: var(--mint-dark);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-shadow: 2px 2px 0px #ffffff;
+    }
+
+    header p {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* 입력 보드 */
+    .input-board {
+      background: var(--bg-card);
+      border: 3px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .input-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-title {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      color: var(--mint-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-count {
+      background: var(--mint-light);
+      color: var(--mint-dark);
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      padding: 3px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .input-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 14px 16px;
+      font-size: 1.05rem;
+      font-family: var(--font-body);
+      line-height: 1.6;
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      background: #FAFCFB;
+      resize: vertical;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--mint-primary);
+      box-shadow: 0 0 0 4px rgba(46, 196, 182, 0.2);
+      background: #FFFFFF;
+    }
+
+    /* 사전 고정 핀 섹션 */
+    .pin-section {
+      background: var(--coral-light);
+      border: 2px dashed #FFB5AC;
+      border-radius: 20px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+    }
+
+    .pin-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--coral-dark);
+      margin-bottom: 12px;
+    }
+
+    .pin-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .pin-controls select {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      font-family: var(--font-body);
+      font-weight: 700;
+      border: 2px solid #FFC8C2;
+      border-radius: 12px;
+      background: #FFFFFF;
+      outline: none;
+      color: var(--text-main);
+    }
+
+    .btn-pin {
+      background: var(--coral-primary);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      padding: 10px 22px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-pin:hover {
+      background: var(--coral-dark);
+      transform: translateY(-1px);
+    }
+
+    .pinned-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pin-chip {
+      background: #FFFFFF;
+      border: 1.5px solid var(--coral-primary);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--coral-dark);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(255, 111, 97, 0.15);
+    }
+
+    .pin-chip button {
+      background: none;
+      border: none;
+      color: #999;
+      font-weight: 900;
+      font-size: 1.1rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .pin-chip button:hover {
+      color: #ff3333;
+    }
+
+    /* 조작 액션 바 */
+    .action-panel {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .btn-assign {
+      background: var(--coral-primary);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      letter-spacing: 0.5px;
+      padding: 16px 44px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 111, 97, 0.35);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-assign:hover:not(:disabled) {
+      background: var(--coral-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(255, 111, 97, 0.45);
+    }
+
+    .btn-assign:disabled {
+      background: #ffb5ad;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-print {
+      background: var(--mint-primary);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      padding: 16px 30px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(46, 196, 182, 0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-print:hover {
+      background: var(--mint-dark);
+      transform: translateY(-2px);
+    }
+
+    /* 결과 카드 영역 */
+    .result-section {
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      border: 3px solid var(--border-color);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--mint-light);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .result-header h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--mint-dark);
+    }
+
+    /* 경제 요약 바 */
+    .economy-summary-bar {
+      display: none;
+      background: #FFFDF5;
+      border: 2px solid #FDE68A;
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      align-items: center;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      color: #78350F;
+    }
+
+    .summary-item strong {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: #B45309;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .result-card {
+      background: #FFFFFF;
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .result-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--mint-primary);
+    }
+
+    .card-pin-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--gold-light);
+      color: #B45309;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      padding: 2px 8px;
+      border-radius: 8px;
+      border: 1px solid #FDE68A;
+    }
+
+    .card-number {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .card-student {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .arrow-icon {
+      font-size: 1.1rem;
+      color: var(--coral-primary);
+      margin-bottom: 8px;
+    }
+
+    .card-role-wrap {
+      margin-bottom: 12px;
+    }
+
+    .card-role {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--mint-dark);
+      background: var(--mint-light);
+      border: 2px solid var(--border-color);
+      padding: 10px 12px;
+      border-radius: 14px;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: keep-all;
+    }
+
+    /* 슬롯머신 롤링 효과 */
+    .card-role.rolling {
+      color: var(--coral-dark);
+      background: var(--coral-light);
+      border-color: #FFC8C2;
+      animation: pulse 0.15s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.97); opacity: 0.8; }
+      100% { transform: scale(1.03); opacity: 1; }
+    }
+
+    /* 경제/월급 및 난이도 태그 영역 */
+    .card-salary-box {
+      background: #FFFDF5;
+      border: 1.5px solid #FDE68A;
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .salary-amount {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: #B45309;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .salary-difficulty {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #D97706;
+    }
+
+    .notice-box {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: #FFFBEB;
+      border-left: 5px solid #F59E0B;
+      color: #92400E;
+      font-size: 1rem;
+      border-radius: 8px;
+    }
+
+    /* 🖨️ A4 용지 인쇄용 스타일 */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+        font-family: sans-serif !important;
+      }
+      #confettiCanvas,
+      .input-board,
+      .pin-section,
+      .action-panel,
+      header p,
+      .notice-box {
+        display: none !important;
+      }
+      .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+      }
+      header h1 {
+        font-size: 2.2rem !important;
+        color: #000000 !important;
+        margin-bottom: 12px !important;
+      }
+      .result-section {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+      }
+      .economy-summary-bar {
+        display: flex !important;
+        border: 1px solid #333 !important;
+        background: #fafafa !important;
+        padding: 8px !important;
+        margin-bottom: 16px !important;
+      }
+      .summary-item {
+        color: #000000 !important;
+      }
+      .cards-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px !important;
+      }
+      .result-card {
+        border: 1.5px solid #333333 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        padding: 12px 8px !important;
+      }
+      .card-student {
+        font-size: 1.4rem !important;
+        color: #000000 !important;
+      }
+      .card-role {
+        font-size: 1.1rem !important;
+        color: #000000 !important;
+        background: #F0F0F0 !important;
+        border: 1px solid #999999 !important;
+      }
+      .card-salary-box {
+        border: 1px solid #999 !important;
+        background: #F9F9F9 !important;
+      }
+      .salary-amount, .salary-difficulty {
+        color: #000000 !important;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .input-board {
+        grid-template-columns: 1fr;
+      }
+      header h1 {
+        font-size: 2.1rem;
+      }
+      .btn-assign {
+        font-size: 1.3rem;
+        padding: 14px 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 꽃가루 연출 캔버스 -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="container">
+    <header>
+      <h1>🏫 우리 반 1인 1역할 배정기</h1>
+      <p>역할을 공정하게 뽑고 학급 화폐(월급)와 함께 교실 경제활동을 시작해 보세요!</p>
+    </header>
+
+    <!-- 입력 목록 영역 -->
+    <section class="input-board">
+      <!-- 학생 명단 -->
+      <div class="input-group">
+        <div class="input-header">
+          <label for="studentsInput" class="input-title">🧑‍🎓 학생 명단</label>
+          <span class="badge-count" id="studentCount">10명</span>
+        </div>
+        <p class="input-desc">이름을 줄바꿈(엔터)으로 한 줄에 한 명씩 입력하세요.</p>
+        <textarea id="studentsInput">김민준
+이서연
+박도윤
+정시우
+최하은
+강지호
+조은서
+윤선우
+임유진
+한승우</textarea>
+      </div>
+
+      <!-- 역할 및 월급 목록 -->
+      <div class="input-group">
+        <div class="input-header">
+          <label for="rolesInput" class="input-title">📋 역할 & 월급(난이도)</label>
+          <span class="badge-count" id="roleCount">10개</span>
+        </div>
+        <p class="input-desc">형식: <code>역할이름 : 월급</code> (금액에 맞춰 난이도 별점이 자동 계산됩니다)</p>
+        <textarea id="rolesInput">분리수거 도우미 : 200,000원
+교실 바닥 쓸기 : 180,000원
+칠판 지우기 : 160,000원
+우유 당번 : 150,000원
+창문 환기 관리 : 140,000원
+전등/전자칠판 끄기 : 120,000원
+학습지 나누기 : 120,000원
+책꽂이/학급문고 정리 : 110,000원
+줄서기 반장 : 100,000원
+식물 물주기 : 100,000원</textarea>
+      </div>
+    </section>
+
+    <!-- 사전 고정 핀 (선택 옵션) -->
+    <section class="pin-section">
+      <div class="pin-header">
+        <span>📌 특정 학생 역할 사전 고정 (선택 사항)</span>
+      </div>
+      <div class="pin-controls">
+        <select id="pinStudentSelect"></select>
+        <span style="font-family: var(--font-display); font-size: 1.2rem; color: var(--coral-dark);">➡️</span>
+        <select id="pinRoleSelect"></select>
+        <button class="btn-pin" id="addPinBtn">📌 핀 꽂기 (고정)</button>
+      </div>
+      <div class="pinned-list" id="pinnedList"></div>
+    </section>
+
+    <!-- 액션 버튼 -->
+    <div class="action-panel">
+      <button class="btn-assign" id="assignBtn">
+        <span>🎲</span> 역할 랜덤 배정하기
+      </button>
+      <button class="btn-print" id="printBtn">
+        <span>🖨️</span> A4 출력하기
+      </button>
+    </div>
+
+    <!-- 결과 카드 섹션 -->
+    <section class="result-section">
+      <div class="result-header">
+        <h2>🎉 이번 달 배정 결과표</h2>
+        <span id="matchStatus" style="font-family: var(--font-display); font-size: 1.25rem; color: var(--mint-dark);">
+          배정하기 버튼을 눌러주세요.
+        </span>
+      </div>
+
+      <!-- 학급 경제 통계 요약 대시보드 -->
+      <div class="economy-summary-bar" id="economySummaryBar">
+        <div class="summary-item">
+          <span>👥 총 배정 인원:</span>
+          <strong id="sumStudents">0명</strong>
+        </div>
+        <div class="summary-item">
+          <span>💰 총 발행 월급:</span>
+          <strong id="sumSalary">0원</strong>
+        </div>
+        <div class="summary-item">
+          <span>📊 1인 평균 월급:</span>
+          <strong id="avgSalary">0원</strong>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="cardsGrid">
+        <p style="grid-column: 1 / -1; text-align: center; color: #8EA5A0; font-family: var(--font-display); font-size: 1.4rem; padding: 48px 0;">
+          버튼을 누르면 두구두구 슬롯머신 연출과 함께 배정이 시작됩니다!
+        </p>
+      </div>
+
+      <div id="noticeContainer"></div>
+    </section>
+  </div>
+
+  <script>
+    const studentsInput = document.getElementById('studentsInput');
+    const rolesInput = document.getElementById('rolesInput');
+    const studentCountBadge = document.getElementById('studentCount');
+    const roleCountBadge = document.getElementById('roleCount');
+    const assignBtn = document.getElementById('assignBtn');
+    const printBtn = document.getElementById('printBtn');
+    const cardsGrid = document.getElementById('cardsGrid');
+    const matchStatus = document.getElementById('matchStatus');
+    const noticeContainer = document.getElementById('noticeContainer');
+    const pinStudentSelect = document.getElementById('pinStudentSelect');
+    const pinRoleSelect = document.getElementById('pinRoleSelect');
+    const addPinBtn = document.getElementById('addPinBtn');
+    const pinnedList = document.getElementById('pinnedList');
+    const economySummaryBar = document.getElementById('economySummaryBar');
+    const sumStudents = document.getElementById('sumStudents');
+    const sumSalary = document.getElementById('sumSalary');
+    const avgSalary = document.getElementById('avgSalary');
+
+    let pinnedPairs = [];
+
+    // 줄바꿈 목록 파싱
+    function parseLines(text) {
+      return text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+    }
+
+    // 역할 정보(이름, 월급, 난이도) 객체 파싱
+    function parseRoleItem(line) {
+      let title = line;
+      let salaryText = '100,000원';
+      let salaryNum = 100000;
+
+      // 콜론(:) 또는 쉼표(,), 하이픈(-) 기준으로 역할과 월급 분리
+      if (line.includes(':')) {
+        const parts = line.split(':');
+        title = parts[0].trim();
+        salaryText = parts[1].trim();
+      } else if (line.includes(',')) {
+        const parts = line.split(',');
+        title = parts[0].trim();
+        salaryText = parts[1].trim();
+      }
+
+      // 숫자만 추출해서 난이도 산정
+      const numOnly = salaryText.replace(/[^0-9]/g, '');
+      if (numOnly) {
+        salaryNum = parseInt(numOnly, 10);
+      }
+
+      // 월급액수에 따른 난이도 등급 판정
+      let difficulty = '⭐ 난이도 하';
+      if (salaryNum >= 170000) {
+        difficulty = '⭐⭐⭐ 난이도 상 (활동량 많음)';
+      } else if (salaryNum >= 130000) {
+        difficulty = '⭐⭐ 난이도 중 (기본 활동)';
+      } else {
+        difficulty = '⭐ 난이도 하 (간편 활동)';
+      }
+
+      return {
+        raw: line,
+        title: title,
+        salaryText: salaryText.includes('원') || salaryText.includes('미소') || salaryText.includes('머니') ? salaryText : `${salaryNum.toLocaleString()}원`,
+        salaryNum: salaryNum,
+        difficulty: difficulty
+      };
+    }
+
+    // 전체 역할 리스트 파싱
+    function getRoleObjects() {
+      const lines = parseLines(rolesInput.value);
+      return lines.map(parseRoleItem);
+    }
+
+    // 인원/역할 카운트 및 고정 드롭다운 갱신
+    function updateInputs() {
+      const students = parseLines(studentsInput.value);
+      const roleObjs = getRoleObjects();
+
+      studentCountBadge.textContent = `${students.length}명`;
+      roleCountBadge.textContent = `${roleObjs.length}개`;
+
+      // 고정 리스트 중 수정/삭제된 항목 필터링
+      pinnedPairs = pinnedPairs.filter(p => 
+        students.includes(p.student) && roleObjs.some(r => r.title === p.role.title)
+      );
+      renderPinnedChips();
+
+      // 드롭다운 옵션 갱신
+      const pinnedStudents = pinnedPairs.map(p => p.student);
+      const pinnedRoleTitles = pinnedPairs.map(p => p.role.title);
+
+      const availableStudents = students.filter(s => !pinnedStudents.includes(s));
+      const availableRoles = roleObjs.filter(r => !pinnedRoleTitles.includes(r.title));
+
+      pinStudentSelect.innerHTML = availableStudents.length 
+        ? availableStudents.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')
+        : '<option value="">(고정 가능한 학생 없음)</option>';
+
+      pinRoleSelect.innerHTML = availableRoles.length 
+        ? availableRoles.map((r, idx) => `<option value="${idx}">${escapeHtml(r.title)} (${r.salaryText})</option>`).join('')
+        : '<option value="">(고정 가능한 역할 없음)</option>';
+    }
+
+    // 고정 태그 칩 렌더링
+    function renderPinnedChips() {
+      pinnedList.innerHTML = pinnedPairs.map((p, idx) => `
+        <span class="pin-chip">
+          📌 ${escapeHtml(p.student)} ➡️ ${escapeHtml(p.role.title)} (${p.role.salaryText})
+          <button onclick="removePin(${idx})" title="고정 해제">✕</button>
+        </span>
+      `).join('');
+    }
+
+    // 고정 핀 추가
+    addPinBtn.addEventListener('click', () => {
+      const student = pinStudentSelect.value;
+      const roleIndex = pinRoleSelect.value;
+      const roleObjs = getRoleObjects();
+
+      if (!student || roleIndex === '' || !roleObjs[roleIndex]) {
+        alert('고정할 학생과 역할을 선택해 주세요.');
+        return;
+      }
+
+      pinnedPairs.push({
+        student: student,
+        role: roleObjs[roleIndex]
+      });
+      updateInputs();
+    });
+
+    // 고정 해제
+    window.removePin = function(index) {
+      pinnedPairs.splice(index, 1);
+      updateInputs();
+    };
+
+    studentsInput.addEventListener('input', updateInputs);
+    rolesInput.addEventListener('input', updateInputs);
+
+    // Fisher-Yates 셔플 알고리즘
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // 배정 프로세스 (2초 슬롯머신 롤링 + 확정)
+    function runAssignment() {
+      const students = parseLines(studentsInput.value);
+      const roleObjs = getRoleObjects();
+
+      if (students.length === 0) {
+        alert('학생 명단을 최소 1명 이상 입력해 주세요.');
+        return;
+      }
+      if (roleObjs.length === 0) {
+        alert('역할 목록을 최소 1개 이상 입력해 주세요.');
+        return;
+      }
+
+      // 고정과 미고정 분리
+      const pinnedStudents = pinnedPairs.map(p => p.student);
+      const pinnedRoleTitles = pinnedPairs.map(p => p.role.title);
+
+      const unpinnedStudents = students.filter(s => !pinnedStudents.includes(s));
+      const unpinnedRoles = roleObjs.filter(r => !pinnedRoleTitles.includes(r.title));
+
+      // 미고정 역할 랜덤 셔플
+      const shuffledRoles = shuffle(unpinnedRoles);
+
+      // 최종 배정 데이터 준비
+      const finalAssignments = {};
+      pinnedPairs.forEach(p => {
+        finalAssignments[p.student] = { roleObj: p.role, isPinned: true };
+      });
+      unpinnedStudents.forEach((student, i) => {
+        const assignedRole = i < shuffledRoles.length ? shuffledRoles[i] : {
+          title: '자율 도우미 (역할 없음)',
+          salaryText: '50,000원',
+          salaryNum: 50000,
+          difficulty: '⭐ 기본 자율 지원'
+        };
+        finalAssignments[student] = { roleObj: assignedRole, isPinned: false };
+      });
+
+      // 슬롯머신 UI 초기화
+      cardsGrid.innerHTML = '';
+      noticeContainer.innerHTML = '';
+      economySummaryBar.style.display = 'none';
+      matchStatus.textContent = '두구두구... 역할을 섞는 중! 🥁';
+      assignBtn.disabled = true;
+      assignBtn.innerHTML = '<span>⏳</span> 두구두구 섞는 중...';
+
+      const cardElements = [];
+
+      students.forEach((student, idx) => {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        const isPinned = finalAssignments[student].isPinned;
+
+        card.innerHTML = `
+          ${isPinned ? '<span class="card-pin-badge">📌 사전 고정</span>' : ''}
+          <div class="card-number">#${idx + 1}</div>
+          <div class="card-student">${escapeHtml(student)}</div>
+          <div class="arrow-icon">▼</div>
+          <div class="card-role-wrap">
+            <div class="card-role ${isPinned ? '' : 'rolling'}" id="role-box-${idx}">
+              ${escapeHtml(isPinned ? finalAssignments[student].roleObj.title : '🎲 섞는 중...')}
+            </div>
+          </div>
+          <div class="card-salary-box" id="salary-box-${idx}">
+            <div class="salary-amount">${isPinned ? '💰 ' + escapeHtml(finalAssignments[student].roleObj.salaryText) : '💰 월급 측정 중...'}</div>
+            <div class="salary-difficulty">${isPinned ? escapeHtml(finalAssignments[student].roleObj.difficulty) : '난이도 분석 중'}</div>
+          </div>
+        `;
+        cardsGrid.appendChild(card);
+        cardElements.push({
+          roleBox: card.querySelector(`#role-box-${idx}`),
+          salaryBox: card.querySelector(`#salary-box-${idx}`),
+          student: student,
+          isPinned: isPinned
+        });
+      });
+
+      cardsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // 2초간 롤링 애니메이션
+      const startTime = Date.now();
+      const duration = 2000;
+      const rollInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        if (elapsed < duration) {
+          cardElements.forEach(item => {
+            if (!item.isPinned) {
+              const randomSample = roleObjs[Math.floor(Math.random() * roleObjs.length)];
+              item.roleBox.textContent = randomSample.title;
+            }
+          });
+        } else {
+          clearInterval(rollInterval);
+          finalizeAssignment(students, roleObjs, finalAssignments, cardElements);
+        }
+      }, 70);
+    }
+
+    // 결과 확정 및 경제 대시보드 갱신
+    function finalizeAssignment(students, roleObjs, finalAssignments, cardElements) {
+      let totalPayroll = 0;
+
+      cardElements.forEach(item => {
+        item.roleBox.classList.remove('rolling');
+        const roleData = finalAssignments[item.student].roleObj;
+        item.roleBox.textContent = roleData.title;
+
+        // 월급 및 난이도 확정 출력
+        item.salaryBox.innerHTML = `
+          <div class="salary-amount">💰 ${escapeHtml(roleData.salaryText)}</div>
+          <div class="salary-difficulty">${escapeHtml(roleData.difficulty)}</div>
+        `;
+
+        totalPayroll += (roleData.salaryNum || 0);
+
+        if (roleData.title.startsWith('자율 도우미')) {
+          item.roleBox.style.background = '#F3F4F6';
+          item.roleBox.style.color = '#9CA3AF';
+          item.roleBox.style.borderColor = '#E5E7EB';
+        }
+      });
+
+      matchStatus.textContent = `총 ${students.length}명 배정 완료! 🎉`;
+      assignBtn.disabled = false;
+      assignBtn.innerHTML = '<span>🎲</span> 역할 랜덤 배정하기';
+
+      // 학급 경제 요약 바 표시
+      economySummaryBar.style.display = 'flex';
+      sumStudents.textContent = `${students.length}명`;
+      sumSalary.textContent = `${totalPayroll.toLocaleString()}원`;
+      const avg = Math.round(totalPayroll / (students.length || 1));
+      avgSalary.textContent = `${avg.toLocaleString()}원`;
+
+      // 인원 불일치 안내
+      if (students.length > roleObjs.length) {
+        noticeContainer.innerHTML = `
+          <div class="notice-box">
+            💡 역할보다 학생 수가 ${students.length - roleObjs.length}명 더 많아 일부 학생은 '자율 도우미'로 배정되었습니다.
+          </div>
+        `;
+      }
+
+      // 꽃가루 연출 발사
+      fireConfetti();
+    }
+
+    // A4 인쇄
+    printBtn.addEventListener('click', () => {
+      window.print();
+    });
+
+    assignBtn.addEventListener('click', runAssignment);
+
+    // ==========================================
+    // 🎊 순수 JS Canvas 꽃가루(Confetti) 엔진
+    // ==========================================
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let confettiAnimationId = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function fireConfetti() {
+      particles = [];
+      const colors = ['#2EC4B6', '#FF6F61', '#FFAA5A', '#FFE66D', '#4D96FF', '#6BCB77'];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height * 0.45,
+          vx: (Math.random() - 0.5) * 24,
+          vy: (Math.random() - 0.7) * 22,
+          size: Math.random() * 8 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          opacity: 1
+        });
+      }
+      if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let activeParticles = 0;
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.45;
+        p.vx *= 0.98;
+        p.rotation += p.rotationSpeed;
+        p.opacity -= 0.007;
+
+        if (p.opacity > 0) {
+          activeParticles++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      });
+
+      if (activeParticles > 0) {
+        confettiAnimationId = requestAnimationFrame(animateConfetti);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[m]));
+    }
+
+    // 초기화
+    updateInputs();
+  </script>
+</body>
+</html>
